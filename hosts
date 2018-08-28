@@ -1,0 +1,15 @@
+[masters]
+master ansible_host=IP ansible_user=root
+[workers]
+slave1 ansible_host=IP ansible_user=root
+slave2 ansible_host=IP ansible_user=root
+
+[glusters]
+gluster1 ansible_host=IP ansible_user=root
+#gluster2 ansible_host=IP ansible_user=root
+[k8s]
+k8s1 ansible_host=IP ansible_user=root
+k8s2 ansible_host=IP ansible_user=root
+k8s3 ansible_host=IP ansible_user=root
+[all:vars]
+ansible_python_interpreter=/usr/bin/python3

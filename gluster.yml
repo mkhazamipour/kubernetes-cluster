@@ -1,0 +1,58 @@
+- hosts: gluster:k8s
+  become: yes
+  tasks:
+    - name: install gluster on all servers
+      apt:
+        name: glusterfs-server
+        state: present
+        update_cache: true
+#      run_once: true
+    - name: make storage directory
+      file:
+        path: /opt/storage
+        state: directory
+        mode: 0755
+    - name: make storage directory
+      file:
+        path: /mnt/shared-directory
+        state: directory
+        mode: 0755
+    - name: Add IP address of all hosts to all hosts
+      lineinfile:
+        dest: /etc/hosts
+        line: "{{ hostvars[item].ansible_host }} {{ hostvars[item].inventory_hostname }}"
+        state: present
+      with_items: "{{ groups.glusters }}"
+- hosts: glusters
+  become: yes
+  tasks:
+    - name: connect peers
+      shell: gluster peer probe "{{ hostvars[item].inventory_hostname }}"
+      with_items: 
+        - "{{ groups.glusters }}"
+    - name: create gluster volume
+      gluster_volume:
+        state: present
+        name: cluster-storage
+        force: yes
+        bricks: /opt/storage
+#        rebalance: yes
+        start_on_create: yes
+        cluster:
+          "{{ groups.glusters }}"
+      run_once: true
+    - name: setting network timeout
+      shell: gluster volume set cluster-storage network.ping-timeout "3"
+- hosts: k8s
+  become: yes
+  tasks:
+    - name: Create mount-point and add it to fstab
+      become: true
+      become_user: root
+      become_method: sudo
+      mount:
+        name: /mnt/shared-directory
+        src: gluster1:/cluster-storage
+        fstype: glusterfs
+        opts: "defaults,_netdev"
+        state: mounted

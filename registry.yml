@@ -1,0 +1,34 @@
+- hosts: master
+  become: yes
+  tasks:
+   - name: initialize registry namespace
+     shell: kubectl create namespace registry >> registry_namespace_created.txt
+     become_user: ubuntu
+     args:
+       chdir: $HOME
+       creates: registry_namespace_created.txt
+   - name: copy registry directory
+     become_user: ubuntu
+     copy:
+       src: registry-with-authentication
+       dest: ~/
+   - name: deploy registry
+     become_user: ubuntu
+     shell: kubectl create -f ~/registry-with-authentication/registry-deployment.yml -f ~/registry-with-authentication/registry-service.yml -f ~/registry-with-authentication/configMap-docker.yml >> registry_deployed.txt
+     args:
+       chdir: $HOME
+       creates: registry_deployed.txt
+
+   - name: delpoy registry-ingress
+     become_user: ubuntu
+     shell:  kubectl create -f ~/registry-with-authentication/registry-ingress.yml >> registry_ingress_created.txt
+     args:
+       chdir: $HOME
+       creates: registry_ingress_created.txt
+
+   - name: delpoy registry-ingress config
+     become_user: ubuntu
+     shell:  kubectl create -f ~/registry-with-authentication/configMap-auth.yml >> registry_ingress_config_created.txt
+     args:
+       chdir: $HOME
+       creates: registry_ingress_config_created.txt

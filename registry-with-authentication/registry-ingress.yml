@@ -1,0 +1,26 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: registry-ingress
+  namespace: registry
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/proxy-body-size: 800m
+    kubernetes.io/tls-acme: 'true'
+
+spec:
+  backend:
+    serviceName: registry
+    servicePort: 5000
+  rules:
+  - host: priv.roozameh.org
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: registry
+          servicePort: 5000
+  tls:
+  - secretName: priv-roozameh-org
+    hosts:
+    - "priv.roozameh.org"

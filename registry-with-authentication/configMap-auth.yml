@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: registry-auth
+  namespace: registry
+data:
+  htpasswd: |
+    mort:$2y$05$bHJ/fhdHRekg3KKR/uOdD.1sVjEPbxEBxukc6YlfabWo5oADFeDtq

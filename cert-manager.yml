@@ -1,0 +1,26 @@
+- hosts: master
+  become: yes
+  tasks:
+   - name: copy registry certificate directory
+     become_user: ubuntu
+     copy:
+       src: certificate
+       dest: ~/
+   - name: install letsencrypt
+     shell: kubectl create -f ~/certificate/letsencrypt.yml >> letsencrypt_installed.txt
+     become_user: ubuntu
+     args:
+       chdir: $HOME
+       creates: letsencrypt_installed.txt
+   - name: add registry certificate
+     shell: kubectl create -f ~/certificate/registry-cert.yml >> registry_cert_added.txt
+     become_user: ubuntu
+     args:
+       chdir: $HOME
+       creates: registry_cert_added.txt
+   - name: add monitoring certificate
+     shell: kubectl create -f ~/certificate/monitoring-cert.yml >> monitoring_cert_added.txt
+     become_user: ubuntu
+     args:
+       chdir: $HOME
+       creates: monitoring_cert_added.txt

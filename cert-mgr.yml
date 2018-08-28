@@ -1,0 +1,9 @@
+- hosts: master
+  become: yes
+  tasks:
+    - name: setting up cert-manager
+      become_user: ubuntu
+      shell: helm install --name cert-manager --namespace kube-system stable/cert-manager >> cert_manager.txt
+      args:
+        chdir: $HOME
+        creates: cert_manager.txt

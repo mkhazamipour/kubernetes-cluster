@@ -1,0 +1,44 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+  name: registry
+  namespace: registry
+  finalizers:
+  - foregroundDeletion
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: registry
+    spec:
+      volumes:
+      - name: registry-config-docker
+        configMap:
+          name: registry-config-docker
+      - name: registry-auth
+        configMap:
+          name: registry-auth
+      containers:
+      - env:
+        - name: REGISTRY_AUTH
+          value: htpasswd
+        - name: REGISTRY_AUTH_HTPASSWD_PATH
+          value: /auth/htpasswd
+        - name: REGISTRY_AUTH_HTPASSWD_REALM
+          value: Registry Realm
+        image: registry
+        name: registry
+        ports:
+        - containerPort: 5000
+        volumeMounts:
+         - name: registry-config-docker
+           mountPath: /etc/docker/registry/config.yml
+           subPath: config.yml
+         - name: registry-auth
+           mountPath: /auth/htpasswd
+           subPath: htpasswd
+        resources: {}
+      restartPolicy: Always
+status: {}

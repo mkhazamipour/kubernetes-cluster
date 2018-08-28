@@ -1,0 +1,10 @@
+
+- hosts: master
+  become: yes
+  tasks:
+    - name: setting ingress controller
+      become_user: ubuntu
+      shell: helm install stable/nginx-ingress --name ingress --namespace kube-system --set controller.kind=DaemonSet --set controller.daemonset.useHostPort=true >> ingress_controller.txt
+      args:
+        chdir: $HOME
+        creates: ingress_controller.txt

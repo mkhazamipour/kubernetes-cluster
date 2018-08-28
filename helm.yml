@@ -1,0 +1,34 @@
+- hosts: master
+  become: yes
+  tasks:
+    - name: adding serviceaccount
+      become_user: ubuntu
+      shell: kubectl create serviceaccount tiller --namespace kube-system >> serviceaccount_initialized.txt
+      args:
+        chdir: $HOME
+        creates: serviceaccount_initialized.txt
+    - name: copy helm files
+      become_user: ubuntu
+      copy:
+        src: helm
+        dest: ~/
+    - name: tiller rbac
+      become_user: ubuntu
+      shell: kubectl create -f ~/helm/tiller_rbac.yml >> tiller_created.txt
+      args:
+        chdir: $HOME
+        creates: tiller_created.txt
+    - name: getting helm
+      become_user: ubuntu
+      shell: curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash >> get_helm.txt
+      args:
+        chdir: $HOME
+        creates: get_helm.txt
+    - name: helm init
+      become_user: ubuntu
+      shell: helm init --service-account tiller --upgrade >> helm_init.txt
+      args:
+        chdir: $HOME
+        creates: helm_init.txt
+    - pause:
+        minutes: 1

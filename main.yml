@@ -1,0 +1,11 @@
+- import_playbook: intial.yml
+- import_playbook: cluster-dependencies.yml
+- import_playbook: cluster-master.yml
+- import_playbook: cluster-workers.yml
+- import_playbook: gluster.yml
+- import_playbook: helm.yml
+- import_playbook: ingress.yml
+- import_playbook: registry.yml
+- import_playbook: monitoring.yml
+- import_playbook: cert-mgr.yml
+- import_playbook: cert-manager.yml
