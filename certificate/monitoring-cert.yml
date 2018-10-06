@@ -1,19 +1,19 @@
 apiVersion: certmanager.k8s.io/v1alpha1
 kind: Certificate
 metadata:
-  name: monitoring-cker-ir
+  name: monitoring-cluster-org
   namespace: monitoring
 spec:
-  secretName: monitoring-cker-ir
+  secretName: monitoring-cluster-org
   issuerRef:
     name: letsencrypt
     kind: ClusterIssuer
-  commonName: monitoring.cker.ir
+  commonName: monitoring.cluster.org
   dnsNames:
-  - monitoring.cker.ir
+  - monitoring.cluster.org
   acme:
     config:
     - http01:
         ingressClass: nginx
       domains:
-      - monitoring.cker.ir
+      - monitoring.cluster.org

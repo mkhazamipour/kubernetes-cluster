@@ -1,12 +1,15 @@
-- hosts: gluster:k8s
+- hosts: glusters:k8s
   become: yes
   tasks:
+    - name: Add gluster repo
+      apt_repository:
+        repo: 'ppa:gluster/glusterfs-3.12'
+        codename: xenial
     - name: install gluster on all servers
       apt:
         name: glusterfs-server
-        state: present
-        update_cache: true
-#      run_once: true
+        state: present    
+        update_cache: yes
     - name: make storage directory
       file:
         path: /opt/storage
@@ -36,7 +39,7 @@
         name: cluster-storage
         force: yes
         bricks: /opt/storage
-#        rebalance: yes
+        rebalance: yes
         start_on_create: yes
         cluster:
           "{{ groups.glusters }}"

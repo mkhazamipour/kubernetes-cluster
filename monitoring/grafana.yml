@@ -54,11 +54,11 @@ ingress:
   labels: {}
   path: /
   hosts:
-    - monitoring.cker.ir
+    - monitoring.cluster.org
   tls: 
-    - secretName: monitoring-cker-ir
+    - secretName: monitoring-cluster-org
       hosts:
-        - monitoring.cker.ir
+        - monitoring.cluster.org
 
 resources: {}
 #  limits:

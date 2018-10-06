@@ -13,7 +13,7 @@ spec:
     serviceName: registry
     servicePort: 5000
   rules:
-  - host: priv.roozameh.org
+  - host: registry.cluster.org
     http:
       paths:
       - path: /
@@ -21,6 +21,6 @@ spec:
           serviceName: registry
           servicePort: 5000
   tls:
-  - secretName: priv-roozameh-org
+  - secretName: registry-cluster-org
     hosts:
-    - "priv.roozameh.org"
+    - "registry.cluster.org"

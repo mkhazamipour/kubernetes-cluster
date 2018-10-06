@@ -24,3 +24,9 @@
      args:
        chdir: $HOME
        creates: monitoring_cert_added.txt
+   - name: add prometheus certificate
+     shell: kubectl create -f ~/certificate/prometheus-cert.yml >> prometheus_cert_added.txt
+     become_user: ubuntu
+     args:
+       chdir: $HOME
+       creates: prometheus_cert_added.txt

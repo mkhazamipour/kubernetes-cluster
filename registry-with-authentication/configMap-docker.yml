@@ -17,8 +17,8 @@ data:
         region: digitalocean-ams3
         regionendpoint: ams3.digitaloceanspaces.com
         bucket: bucket-name
-        accesskey: access-key
-        secretkey: secret-key
+        accesskey: key
+        secretkey: key
       delete:
         enabled: true
     http:

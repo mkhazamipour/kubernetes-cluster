@@ -1,4 +1,45 @@
-- hosts: workers
+- hosts: newnodes
+  become: yes
+  tasks:
+    - name: Add gluster repo
+      apt_repository:
+        repo: 'ppa:gluster/glusterfs-3.12'
+        codename: xenial
+    - name: install gluster on all servers
+      apt:
+        name: glusterfs-server
+        state: present    
+        update_cache: yes
+    - name: make storage directory
+      file:
+        path: /opt/storage
+        state: directory
+        mode: 0755
+    - name: make storage directory
+      file:
+        path: /mnt/shared-directory
+        state: directory
+        mode: 0755
+    - name: Add IP address of all hosts to all hosts
+      lineinfile:
+        dest: /etc/hosts
+        line: "{{ hostvars[item].ansible_host }} {{ hostvars[item].inventory_hostname }}"
+        state: present
+      with_items: "{{ groups.glusters }}"
+- hosts: newnodes
+  become: yes
+  tasks:
+    - name: Create mount-point and add it to fstab
+      become: true
+      become_user: root
+      become_method: sudo
+      mount:
+        name: /mnt/shared-directory
+        src: gluster1:/cluster-storage
+        fstype: glusterfs
+        opts: "defaults,_netdev"
+        state: mounted
+- hosts: newnodes
   become: yes
   tasks:
    - name: Install prerequisites
@@ -8,60 +49,6 @@
      - ca-certificates
      - curl
      - software-properties-common
-   - name: Add Docker GPG key
-     apt_key: url=https://download.docker.com/linux/ubuntu/gpg
-   - name:  Add Docker APT repository
-     apt_repository:
-      repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ansible_distribution_release}} stable
-   - name: install Docker
-     apt:
-       name: docker-ce=17.03.2~ce-0~ubuntu-xenial
-       state: present
-       update_cache: true
-   - name: install APT Transport HTTPS
-     apt:
-       name: apt-transport-https
-       state: present
-   - name: add Kubernetes apt-key
-     apt_key:
-       url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
-       state: present
-   - name: add Kubernetes' APT repository
-     apt_repository:
-      repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
-      state: present
-      filename: 'kubernetes'
-   - name: install kuberenetes-cni
-     apt:
-       name: kubernetes-cni=0.6.0-00
-       state: present
-       update_cache: true
-   - name: install kubectl
-     apt:
-       name: kubectl=1.11.3-00
-       state: present
-       update_cache: true
-   - name: install kubelet
-     apt:
-       name: kubelet=1.11.3-00
-       state: present
-       update_cache: true
-   - name: install kubeadm
-     apt:
-       name: kubeadm=1.11.3-00
-       state: present
-       update_cache: true
-- hosts: master
-  become: yes
-  tasks:
-   - name: Install prerequisites
-     apt: name={{item}} update_cache=yes
-     with_items:
-     - apt-transport-https
-     - ca-certificates
-     - curl
-     - software-properties-common
-     run_once: true
    - name: Add Docker GPG key
      apt_key: url=https://download.docker.com/linux/ubuntu/gpg
      run_once: true
@@ -79,7 +66,6 @@
      apt:
        name: apt-transport-https
        state: present
-     run_once: true
    - name: add Kubernetes apt-key
      apt_key:
        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
@@ -115,3 +101,23 @@
        state: present
        update_cache: true
      run_once: true
+- hosts: master
+  become: yes
+  gather_facts: false
+  tasks:
+    - name: get join command
+      shell: kubeadm token create --print-join-command
+      register: join_command_raw
+
+    - name: set join command
+      set_fact:
+        join_command: "{{ join_command_raw.stdout_lines[0] }}"
+
+
+- hosts: newnodes
+  become: yes
+  tasks:
+    - name: join cluster
+      shell: "{{ hostvars['master'].join_command }} >> node_joined.txt"
+      args:
+        chdir: $HOME
