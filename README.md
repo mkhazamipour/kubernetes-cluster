@@ -1,3 +1,5 @@
+# Installation Demo
+[![asciicast](https://asciinema.org/a/206649.png)](https://asciinema.org/a/206649)
 # Kubernetes cluster
 
 To setup k8s cluster you need to change some values.
