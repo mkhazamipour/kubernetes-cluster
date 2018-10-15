@@ -1,4 +1,4 @@
-- hosts: all
+- hosts: masters:workers:glusters
   become: yes
   tasks:
     - name: create the 'ubuntu' user
