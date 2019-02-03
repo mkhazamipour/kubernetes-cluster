@@ -14,21 +14,21 @@
        dest: ~/
    - name: deploy registry
      become_user: ubuntu
-     shell: kubectl create -f ~/registry-with-authentication/registry-deployment.yml -f ~/registry-with-authentication/registry-service.yml -f ~/registry-with-authentication/configMap-docker.yml >> registry_deployed.txt
+     shell: kubectl create -f ~/registry-with-authentication/registry-deployment.yaml -f ~/registry-with-authentication/registry-service.yaml -f ~/registry-with-authentication/configMap-docker.yaml >> registry_deployed.txt
      args:
        chdir: $HOME
        creates: registry_deployed.txt
 
    - name: delpoy registry-ingress
      become_user: ubuntu
-     shell:  kubectl create -f ~/registry-with-authentication/registry-ingress.yml >> registry_ingress_created.txt
+     shell:  kubectl create -f ~/registry-with-authentication/registry-ingress.yaml >> registry_ingress_created.txt
      args:
        chdir: $HOME
        creates: registry_ingress_created.txt
 
    - name: delpoy registry-ingress config
      become_user: ubuntu
-     shell:  kubectl create -f ~/registry-with-authentication/configMap-auth.yml >> registry_ingress_config_created.txt
+     shell:  kubectl create -f ~/registry-with-authentication/configMap-auth.yaml >> registry_ingress_config_created.txt
      args:
        chdir: $HOME
        creates: registry_ingress_config_created.txt

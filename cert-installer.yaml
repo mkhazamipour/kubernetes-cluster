@@ -7,26 +7,20 @@
        src: certificate
        dest: ~/
    - name: install letsencrypt
-     shell: kubectl create -f ~/certificate/letsencrypt.yml >> letsencrypt_installed.txt
+     shell: kubectl create -f ~/certificate/letsencrypt.yaml >> letsencrypt_installed.txt
      become_user: ubuntu
      args:
        chdir: $HOME
        creates: letsencrypt_installed.txt
    - name: add registry certificate
-     shell: kubectl create -f ~/certificate/registry-cert.yml >> registry_cert_added.txt
+     shell: kubectl create -f ~/certificate/registry-cert.yaml >> registry_cert_added.txt
      become_user: ubuntu
      args:
        chdir: $HOME
        creates: registry_cert_added.txt
    - name: add monitoring certificate
-     shell: kubectl create -f ~/certificate/monitoring-cert.yml >> monitoring_cert_added.txt
+     shell: kubectl create -f ~/certificate/monitoring-cert.yaml >> monitoring_cert_added.txt
      become_user: ubuntu
      args:
        chdir: $HOME
        creates: monitoring_cert_added.txt
-   - name: add prometheus certificate
-     shell: kubectl create -f ~/certificate/prometheus-cert.yml >> prometheus_cert_added.txt
-     become_user: ubuntu
-     args:
-       chdir: $HOME
-       creates: prometheus_cert_added.txt

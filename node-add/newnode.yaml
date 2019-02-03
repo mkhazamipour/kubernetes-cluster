@@ -8,7 +8,7 @@
     - name: install gluster on all servers
       apt:
         name: glusterfs-server
-        state: present    
+        state: present
         update_cache: yes
     - name: make storage directory
       file:
@@ -58,7 +58,7 @@
      run_once: true
    - name: install Docker
      apt:
-       name: docker-ce=17.03.2~ce-0~ubuntu-xenial
+       name: docker-ce=18.06.0~ce~3-0~ubuntu
        state: present
        update_cache: true
      run_once: true
@@ -77,27 +77,21 @@
       state: present
       filename: 'kubernetes'
      run_once: true
-   - name: install kuberenetes-cni
+   - name: install kubectl
      apt:
-       name: kubernetes-cni=0.6.0-00
-       state: present
-       update_cache: true
-     run_once: true
-   - name: install kubectl        
-     apt:
-       name: kubectl=1.11.3-00
+       name: kubectl
        state: present
        update_cache: true
      run_once: true
    - name: install kubelet
      apt:
-       name: kubelet=1.11.3-00
+       name: kubelet
        state: present
        update_cache: true
      run_once: true
    - name: install kubeadm
      apt:
-       name: kubeadm=1.11.3-00
+       name: kubeadm
        state: present
        update_cache: true
      run_once: true

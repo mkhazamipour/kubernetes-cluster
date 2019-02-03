@@ -8,7 +8,7 @@
     - name: install gluster on all servers
       apt:
         name: glusterfs-server
-        state: present    
+        state: present
         update_cache: yes
     - name: make storage directory
       file:
@@ -39,7 +39,7 @@
         name: cluster-storage
         force: yes
         bricks: /opt/storage
-        rebalance: yes
+#        rebalance: yes //UNCOMMENT IF YOU HAVE MORE THAN 1 BRICK IN YOUR POOL//
         start_on_create: yes
         cluster:
           "{{ groups.glusters }}"

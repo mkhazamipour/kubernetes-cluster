@@ -17,14 +17,14 @@
         mode: 0777
     - name: Making grafana directory in gluster storage
       become: yes
-      become_user: root 
+      become_user: root
       file:
         path: /mnt/shared-directory/infrastructure/grafana
         state: directory
         mode: 0777
     - name: Making prometheus directory in gluster storage
       become: yes
-      become_user: root 
+      become_user: root
       file:
         path: /mnt/shared-directory/infrastructure/prometheus
         state: directory
@@ -36,56 +36,38 @@
         path: /mnt/shared-directory/infrastructure/alertmanager
         state: directory
         mode: 0777
-    - name: Copying Installation file 
+    - name: Copying Installation file
       become_user: ubuntu
       copy:
         src: monitoring
         dest: ~/
     - name: Creating alertmanager persistent volume
       become_user: ubuntu
-      shell: kubectl create -f ~/monitoring/alertmanager-pv.yml >> alertmanager-pv_created.txt
+      shell: kubectl create -f ~/monitoring/alertmanager-volume.yaml >> alertmanager-volume_created.txt
       args:
         chdir: $HOME
-        creates: alertmanager-pv_created.txt
-    - name: Creating alertmanager persistent volume claim
-      become_user: ubuntu
-      shell: kubectl create -f ~/monitoring/alertmanager-pvc.yml >> alertmanager-pvc_created.txt
-      args:
-        chdir: $HOME
-        creates: alertmanager-pvc_created.txt
+        creates: alertmanager-volume_created.txt
     - name: Creating prometheus persistent volume
       become_user: ubuntu
-      shell: kubectl create -f ~/monitoring/prometheus-pv.yml >> prometheus-pv_created.txt
+      shell: kubectl create -f ~/monitoring/prometheus-pv.yaml >> prometheus-volume_created.txt
       args:
         chdir: $HOME
-        creates: prometheus-pv_created.txt
-    - name: Creating prometheus persistent volume claim
-      become_user: ubuntu
-      shell: kubectl create -f ~/monitoring/prometheus-pvc.yml >> prometheus-pvc_created.txt
-      args:
-        chdir: $HOME
-        creates: prometheus-pvc_created.txt
+        creates: prometheus-volume_created.txt
     - name: Creating grafana persistent volume
       become_user: ubuntu
-      shell: kubectl create -f ~/monitoring/grafana-pv.yml >> grafana-pv_created.txt
+      shell: kubectl create -f ~/monitoring/grafana-pv.yaml >> grafana-volume_created.txt
       args:
         chdir: $HOME
-        creates: grafana-pv_created.txt
-    - name: Creating grafana persistent volume claim
-      become_user: ubuntu
-      shell: kubectl create -f ~/monitoring/grafana-pvc.yml >> grafana-pvc_created.txt
-      args:
-        chdir: $HOME
-        creates: grafana-pvc_created.txt
+        creates: grafana-volume_created.txt
     - name: Installing prometheus using HELM and Charts
       become_user: ubuntu
-      shell: helm install -f ~/monitoring/prometheus.yml stable/prometheus --namespace monitoring --name monitoring >> prometheus_installed.txt
+      shell: helm install -f ~/monitoring/prometheus.yaml stable/prometheus --namespace monitoring --name monitoring >> prometheus_installed.txt
       args:
         chdir: $HOME
         creates: prometheus_installed.txt
     - name: Installing grafana using HELM and Charts
       become_user: ubuntu
-      shell: helm install -f ~/monitoring/grafana.yml stable/grafana --namespace monitoring --name grafana >> grafana_installed.txt
+      shell: helm install -f ~/monitoring/grafana.yaml stable/grafana --namespace monitoring --name grafana >> grafana_installed.txt
       args:
         chdir: $HOME
         creates: grafana_installed.txt
@@ -96,5 +78,4 @@
   tasks:
     -  shell: grep -R "monitoring-prometheus-server.monitoring.svc.cluster.local" ~/prometheus_installed.txt
        register: datasource_url
-    -  debug: var=datasource_url 
-    
+    -  debug: var=datasource_url
