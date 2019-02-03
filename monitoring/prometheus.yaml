@@ -155,7 +155,7 @@ alertmanager:
     ## alertmanager data Persistent Volume existing claim name
     ## Requires alertmanager.persistentVolume.enabled: true
     ## If defined, PVC must be created manually before volume will be bound
-    existingClaim: ""
+    existingClaim: "alertmanager-claim"
 
     ## alertmanager data Persistent Volume mount root path
     ##
