@@ -1,26 +1,66 @@
 - hosts: master
   become: yes
   tasks:
-   - name: copy registry certificate directory
+   - name: Prepairing Prometheus Certificates
      become_user: ubuntu
-     copy:
-       src: certificate
-       dest: ~/
-   - name: install letsencrypt
-     shell: kubectl create -f ~/certificate/letsencrypt.yaml >> letsencrypt_installed.txt
+     replace:
+       path: ~/certificates/prometheus.yaml
+       regexp: "{{ item.regexp }}"
+       replace: "{{ item.var }}"
+     with_items:
+       - { regexp: 'prometheus_certificate', var: "{{ prometheus_certificate }}" }
+       - { regexp: 'prometheus.url', var: "{{ prometheus_address_http }}" }
+
+   - name: Prepairing Alertmanager Certificates
      become_user: ubuntu
+     replace:
+       path: ~/certificates/alertmanager.yaml
+       regexp: "{{ item.regexp }}"
+       replace: "{{ item.var }}"
+     with_items:
+       - { regexp: 'alertmanager_certificate', var: "{{ alertmanager_certificate }}" }
+       - { regexp: 'alertmanager.url', var: "{{ alertmanager_address_http }}" }
+
+
+   - name: Prepairing Alertmanager Certificates
+     become_user: ubuntu
+     replace:
+       path: ~/certificates/grafana.yaml
+       regexp: "{{ item.regexp }}"
+       replace: "{{ item.var }}"
+     with_items:
+       - { regexp: 'grafana_certificate', var: "{{ grafana_certificate }}" }
+       - { regexp: 'grafana.url', var: "{{ grafana_address_http }}" }
+
+   - name: Prepairing Pushgateway Certificates
+     become_user: ubuntu
+     replace:
+       path: ~/certificates/pushgateway.yaml
+       regexp: "{{ item.regexp }}"
+       replace: "{{ item.var }}"
+     with_items:
+       - { regexp: 'pushgateway_certificate', var: "{{ pushgateway_certificate }}" }
+       - { regexp: 'pushgateway.url', var: "{{ pushgateway_address_http }}" }
+
+   - name: Prepairing Registry Certificates
+     become_user: ubuntu
+     replace:
+       path: ~/certificates/registry.yaml
+       regexp: "{{ item.regexp }}"
+       replace: "{{ item.var }}"
+     with_items:
+       - { regexp: 'registry_certificate', var: "{{ registry_certificate }}" } 
+       - { regexp: 'registry.url', var: "{{ registry_address_http }}" }
+
+   - name: deploy registry
+     become_user: ubuntu
+     shell: kubectl create -f {{ item.yaml }} >> certificate_{{ item.file }}_created.info
+     with_items:
+       - { yaml: '~/certificates/prometheus.yaml', file: 'prometheus' }
+       - { yaml: '~/certificates/alertmanager.yaml', file: 'alertmanager' }
+       - { yaml: '~/certificates/pushgateway.yaml', file: 'pushgateway' }
+       - { yaml: '~/certificates/grafana.yaml', file: 'grafana' }
+       - { yaml: '~/certificates/registry.yaml', file: 'registry' }
      args:
        chdir: $HOME
-       creates: letsencrypt_installed.txt
-   - name: add registry certificate
-     shell: kubectl create -f ~/certificate/registry-cert.yaml >> registry_cert_added.txt
-     become_user: ubuntu
-     args:
-       chdir: $HOME
-       creates: registry_cert_added.txt
-   - name: add monitoring certificate
-     shell: kubectl create -f ~/certificate/monitoring-cert.yaml >> monitoring_cert_added.txt
-     become_user: ubuntu
-     args:
-       chdir: $HOME
-       creates: monitoring_cert_added.txt
+       creates: certificate_{{ item.file }}_created.info

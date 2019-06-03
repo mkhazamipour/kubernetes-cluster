@@ -1,26 +1,26 @@
 - hosts: newnodes
   become: yes
   tasks:
-    - name: Add gluster repo
+    - name: Add GlusterFS Repository
       apt_repository:
-        repo: 'ppa:gluster/glusterfs-3.12'
+        repo: 'ppa:gluster/glusterfs-3.13'
         codename: xenial
-    - name: install gluster on all servers
+    - name: install GlusterFS on all servers
       apt:
         name: glusterfs-server
         state: present
         update_cache: yes
-    - name: make storage directory
+    - name: Make storage directory on GlusterFS Server
       file:
-        path: /opt/storage
+        path: /opt/shared-storage
         state: directory
         mode: 0755
-    - name: make storage directory
+    - name: Make storage directory to mount on nodes
       file:
         path: /mnt/shared-directory
         state: directory
         mode: 0755
-    - name: Add IP address of all hosts to all hosts
+    - name: Add IP address of hosts to /etc/hosts
       lineinfile:
         dest: /etc/hosts
         line: "{{ hostvars[item].ansible_host }} {{ hostvars[item].inventory_hostname }}"
@@ -58,7 +58,7 @@
      run_once: true
    - name: install Docker
      apt:
-       name: docker-ce=18.06.0~ce~3-0~ubuntu
+       name: docker-ce=18.06.3~ce~3-0~ubuntu
        state: present
        update_cache: true
      run_once: true
@@ -77,19 +77,19 @@
       state: present
       filename: 'kubernetes'
      run_once: true
-   - name: install kubectl
+   - name: install kubectl=1.13.5-00
      apt:
        name: kubectl
        state: present
        update_cache: true
      run_once: true
-   - name: install kubelet
+   - name: install kubelet=1.13.5-00
      apt:
        name: kubelet
        state: present
        update_cache: true
      run_once: true
-   - name: install kubeadm
+   - name: install kubeadm=1.13.5-00
      apt:
        name: kubeadm
        state: present
@@ -107,11 +107,9 @@
       set_fact:
         join_command: "{{ join_command_raw.stdout_lines[0] }}"
 
-
 - hosts: newnodes
   become: yes
   tasks:
     - name: join cluster
-      shell: "{{ hostvars['master'].join_command }} >> node_joined.txt"
-      args:
-        chdir: $HOME
+      shell: "{{ hostvars['master'].join_command }}"
+

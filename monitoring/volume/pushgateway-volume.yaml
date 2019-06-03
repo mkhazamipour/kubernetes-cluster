@@ -1,31 +1,31 @@
 kind: PersistentVolume
 apiVersion: v1
 metadata:
-  name: grafana-volume
+  name: pushgateway-volume
   labels:
     type: local
     namespace_name: monitoring
 spec:
   storageClassName: manual
   capacity:
-    storage: 8Gi
+    storage: 2Gi
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   hostPath:
-    path: "/mnt/shared-directory/infrastructure/grafana"
+    path: "/mnt/shared-directory/infrastructure/pushgateway"
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: grafana-claim
+  name: pushgateway-claim
   namespace: monitoring
 spec:
   storageClassName: manual
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
-      storage: 8Gi
+      storage: 2Gi
   selector:
     matchLabels:
       namespace_name: monitoring

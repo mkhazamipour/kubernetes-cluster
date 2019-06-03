@@ -13,7 +13,7 @@ spec:
     serviceName: registry
     servicePort: 5000
   rules:
-  - host: registry.cluster.org
+  - host: registry_address_http
     http:
       paths:
       - path: /
@@ -21,6 +21,6 @@ spec:
           serviceName: registry
           servicePort: 5000
   tls:
-  - secretName: registry-cluster-org
+  - secretName: registry_certificate
     hosts:
-    - "registry.cluster.org"
+    - registry_address_http

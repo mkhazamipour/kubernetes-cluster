@@ -1,31 +1,31 @@
 kind: PersistentVolume
 apiVersion: v1
 metadata:
-  name: prometheus-volume
+  name: grafana-volume
   labels:
     type: local
     namespace_name: monitoring
 spec:
   storageClassName: manual
   capacity:
-    storage: 40Gi
+    storage: 2Gi
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   hostPath:
-    path: "/mnt/shared-directory/infrastructure/prometheus"
+    path: "/mnt/shared-directory/infrastructure/grafana"
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: prometheus-claim
+  name: grafana-claim
   namespace: monitoring
 spec:
   storageClassName: manual
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
-      storage: 40Gi
+      storage: 2Gi
   selector:
     matchLabels:
       namespace_name: monitoring

@@ -5,4 +5,4 @@ metadata:
   namespace: registry
 data:
   htpasswd: |
-    mort:$2y$05$bHJ/fhdHRekg3KKR/uOdD.1sVjEPbxEBxukc6YlfabWo5oADFeDtq
+    admin:$2y$05$8U3334SJIVIRzYaXKWB.8u6bbw03iPt09r1A56XrwJyFD3rLz.dPq # admin:123123

@@ -8,9 +8,9 @@ metadata:
 spec:
   storageClassName: manual
   capacity:
-    storage: 8Gi
+    storage: 2Gi
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   hostPath:
     path: "/mnt/shared-directory/infrastructure/alertmanager"
 ---
@@ -22,10 +22,10 @@ metadata:
 spec:
   storageClassName: manual
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
-      storage: 8Gi
+      storage: 2Gi
   selector:
     matchLabels:
       namespace_name: monitoring

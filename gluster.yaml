@@ -1,26 +1,28 @@
-- hosts: glusters:k8s
+- hosts: k8s:glusters
   become: yes
   tasks:
-    - name: Add gluster repo
+    - name: Add GlusterFS Repository
       apt_repository:
-        repo: 'ppa:gluster/glusterfs-3.12'
+        repo: 'ppa:gluster/glusterfs-3.13'
         codename: xenial
-    - name: install gluster on all servers
+    - name: install GlusterFS on all servers
       apt:
         name: glusterfs-server
         state: present
         update_cache: yes
-    - name: make storage directory
+    - name: Make storage directory on GlusterFS Server
       file:
-        path: /opt/storage
+        path: /opt/shared-storage
         state: directory
         mode: 0755
-    - name: make storage directory
+      run_once: true
+    - name: Make storage directory to mount on nodes
       file:
         path: /mnt/shared-directory
         state: directory
         mode: 0755
-    - name: Add IP address of all hosts to all hosts
+      run_once: true
+    - name: Add IP address of hosts to /etc/hosts
       lineinfile:
         dest: /etc/hosts
         line: "{{ hostvars[item].ansible_host }} {{ hostvars[item].inventory_hostname }}"
@@ -33,23 +35,23 @@
       shell: gluster peer probe "{{ hostvars[item].inventory_hostname }}"
       with_items: 
         - "{{ groups.glusters }}"
-    - name: create gluster volume
+    - name: Create GlusterFS Volume
       gluster_volume:
         state: present
         name: cluster-storage
         force: yes
-        bricks: /opt/storage
+        bricks: /opt/shared-storage
 #        rebalance: yes //UNCOMMENT IF YOU HAVE MORE THAN 1 BRICK IN YOUR POOL//
         start_on_create: yes
         cluster:
           "{{ groups.glusters }}"
       run_once: true
-    - name: setting network timeout
+    - name: Setting network timeout
       shell: gluster volume set cluster-storage network.ping-timeout "3"
 - hosts: k8s
   become: yes
   tasks:
-    - name: Create mount-point and add it to fstab
+    - name: Create mount-point on nodes and add it to fstab
       become: true
       become_user: root
       become_method: sudo

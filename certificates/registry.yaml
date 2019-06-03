@@ -1,0 +1,19 @@
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: registry_certificate
+  namespace: registry
+spec:
+  secretName: registry_certificate
+  issuerRef:
+    name: letsencrypt
+    kind: ClusterIssuer
+  commonName: registry.url
+  dnsNames:
+  - registry.url
+  acme:
+    config:
+    - http01:
+        ingressClass: nginx
+      domains:
+      - registry.url

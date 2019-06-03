@@ -1,7 +1,7 @@
 - hosts: workers
   become: yes
   tasks:
-   - name: Install prerequisites
+   - name: Installing prerequisites
      apt: name={{item}} update_cache=yes
      with_items:
      - apt-transport-https
@@ -13,12 +13,12 @@
    - name:  Add Docker APT repository
      apt_repository:
       repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ansible_distribution_release}} stable
-   - name: install Docker
+   - name: Installing Docker
      apt:
-       name: docker-ce=18.06.0~ce~3-0~ubuntu
+       name: docker-ce=18.06.3~ce~3-0~ubuntu
        state: present
        update_cache: true
-   - name: install APT Transport HTTPS
+   - name: Installing APT Transport HTTPS
      apt:
        name: apt-transport-https
        state: present
@@ -31,25 +31,25 @@
       repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
       state: present
       filename: 'kubernetes'
-   - name: install kubectl
+   - name: Installing kubectl
      apt:
-       name: kubectl
+       name: kubectl=1.13.5-00
        state: present
        update_cache: true
-   - name: install kubelet
+   - name: Installing kubelet
      apt:
-       name: kubelet
+       name: kubelet=1.13.5-00
        state: present
        update_cache: true
-   - name: install kubeadm
+   - name: Installing kubeadm
      apt:
-       name: kubeadm
+       name: kubeadm=1.13.5-00
        state: present
        update_cache: true
 - hosts: master
   become: yes
   tasks:
-   - name: Install prerequisites
+   - name: Installing prerequisites
      apt: name={{item}} update_cache=yes
      with_items:
      - apt-transport-https
@@ -64,13 +64,13 @@
      apt_repository:
       repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ansible_distribution_release}} stable
      run_once: true
-   - name: install Docker
+   - name: Installing Docker
      apt:
-       name: docker-ce=18.06.0~ce~3-0~ubuntu
+       name: docker-ce=18.06.3~ce~3-0~ubuntu
        state: present
        update_cache: true
      run_once: true
-   - name: install APT Transport HTTPS
+   - name: Installing APT Transport HTTPS
      apt:
        name: apt-transport-https
        state: present
@@ -86,21 +86,21 @@
       state: present
       filename: 'kubernetes'
      run_once: true
-   - name: install kubectl
+   - name: Installing kubectl
      apt:
-       name: kubectl
+       name: kubectl=1.13.5-00
        state: present
        update_cache: true
      run_once: true
-   - name: install kubelet
+   - name: Installing kubelet
      apt:
-       name: kubelet
+       name: kubelet=1.13.5-00
        state: present
        update_cache: true
      run_once: true
-   - name: install kubeadm
+   - name: Installing kubeadm
      apt:
-       name: kubeadm
+       name: kubeadm=1.13.5-00
        state: present
        update_cache: true
      run_once: true

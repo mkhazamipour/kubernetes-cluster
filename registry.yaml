@@ -1,34 +1,36 @@
 - hosts: master
   become: yes
   tasks:
-   - name: initialize registry namespace
-     shell: kubectl create namespace registry >> registry_namespace_created.txt
+   - name: Creating Registry Namespace
+     shell: kubectl create namespace registry >> registry_ns_created.info
      become_user: ubuntu
      args:
        chdir: $HOME
-       creates: registry_namespace_created.txt
+       creates: registry_ns_created.info
    - name: copy registry directory
      become_user: ubuntu
      copy:
        src: registry-with-authentication
        dest: ~/
+   - name: Prepairing Ingress Configuration
+     become_user: ubuntu
+     replace:
+       path: ~/registry-with-authentication/registry-ingress.yaml
+       regexp: "{{ item.regexp }}"
+       replace: "{{ item.var }}"
+     with_items:
+       - { regexp: 'registry_certificate', var: "{{ registry_certificate }}" } 
+       - { regexp: 'registry_address_http', var: "{{ registry_address_http }}" }
+
    - name: deploy registry
      become_user: ubuntu
-     shell: kubectl create -f ~/registry-with-authentication/registry-deployment.yaml -f ~/registry-with-authentication/registry-service.yaml -f ~/registry-with-authentication/configMap-docker.yaml >> registry_deployed.txt
+     shell: kubectl create -f {{ item.yaml }} >> registry_{{ item.file }}.info
+     with_items:
+       - { yaml: '~/registry-with-authentication/registry-deployment.yaml', file: 'deployment' }
+       - { yaml: '~/registry-with-authentication/registry-service.yaml', file: 'service' }
+       - { yaml: '~/registry-with-authentication/registry-ingress.yaml', file: 'ingress' }
+       - { yaml: '~/registry-with-authentication/configMap-docker.yaml', file: 'configmap' }
+       - { yaml: '~/registry-with-authentication/configMap-auth.yaml', file: 'auth' }
      args:
        chdir: $HOME
-       creates: registry_deployed.txt
-
-   - name: delpoy registry-ingress
-     become_user: ubuntu
-     shell:  kubectl create -f ~/registry-with-authentication/registry-ingress.yaml >> registry_ingress_created.txt
-     args:
-       chdir: $HOME
-       creates: registry_ingress_created.txt
-
-   - name: delpoy registry-ingress config
-     become_user: ubuntu
-     shell:  kubectl create -f ~/registry-with-authentication/configMap-auth.yaml >> registry_ingress_config_created.txt
-     args:
-       chdir: $HOME
-       creates: registry_ingress_config_created.txt
+       creates: registry_{{ item.file }}.info

@@ -1,81 +1,98 @@
 - hosts: master
   become: yes
-  become_user: ubuntu
+  become_user: root
   tasks:
     - name: Creating monitoring namespace
-      shell: kubectl create namespace monitoring >> ~/monitoring_namespace_created.txt
-      become_user: ubuntu
+      shell: kubectl create namespace monitoring >> monitoring_ns_created.info
       args:
         chdir: $HOME
-        creates: monitoring_namespace_created.txt
+        creates: monitoring_ns_created.info
+      become_user: ubuntu
     - name: Making infrastructure directory in gluster storage
-      become: yes
-      become_user: root
       file:
         path: /mnt/shared-directory/infrastructure
         state: directory
         mode: 0777
+      run_once: true
     - name: Making grafana directory in gluster storage
-      become: yes
-      become_user: root
       file:
         path: /mnt/shared-directory/infrastructure/grafana
         state: directory
         mode: 0777
+      run_once: true
     - name: Making prometheus directory in gluster storage
-      become: yes
-      become_user: root
       file:
         path: /mnt/shared-directory/infrastructure/prometheus
         state: directory
         mode: 0777
+      run_once: true
     - name: Making alertmanager directory in gluster storage
-      become: yes
-      become_user: root
       file:
         path: /mnt/shared-directory/infrastructure/alertmanager
         state: directory
         mode: 0777
-    - name: Copying Installation file
+      run_once: true
+    - name: Making pushgateway directory in gluster storage
+      file:
+        path: /mnt/shared-directory/infrastructure/pushgateway
+        state: directory
+        mode: 0777
+      run_once: true
+    - name: Copying PV and PVC to installation directory
       become_user: ubuntu
       copy:
         src: monitoring
         dest: ~/
-    - name: Creating alertmanager persistent volume
+    - name: Creating Monitoring Persistent Storage
       become_user: ubuntu
-      shell: kubectl create -f ~/monitoring/alertmanager-volume.yaml >> alertmanager-volume_created.txt
+      shell: kubectl create -f {{ item.yaml }} >> monitoring_{{ item.file }}.info
+      with_items:
+        - { yaml: '~/monitoring/volume/alertmanager-volume.yaml', file: 'alertmanager-volume' }
+        - { yaml: '~/monitoring/volume/pushgateway-volume.yaml', file: 'pushgateway-volume' }
+        - { yaml: '~/monitoring/volume/prometheus-volume.yaml', file: 'prometheus-volume' }
+        - { yaml: '~/monitoring/volume/grafana-volume.yaml', file: 'grafana-volume' }
       args:
         chdir: $HOME
-        creates: alertmanager-volume_created.txt
-    - name: Creating prometheus persistent volume
+        creates: monitoring_{{ item.file }}.info
+    - name: Prepairing Prometheus Deployment
       become_user: ubuntu
-      shell: kubectl create -f ~/monitoring/prometheus-pv.yaml >> prometheus-volume_created.txt
+      replace:
+        path: ~/monitoring/prometheus.yaml
+        regexp: "{{ item.regexp }}"
+        replace: "{{ item.var }}"
+      with_items:
+        - { regexp: 'alertmanager_ingress_bool', var: "{{ alertmanager_ingress_bool }}" }
+        - { regexp: 'alertmanager_address_http$', var: "{{ alertmanager_address_http }}" }
+        - { regexp: 'alertmanager_address_https', var: "{{ alertmanager_address_https }}" }
+        - { regexp: 'alertmanager_certificate', var: "{{ alertmanager_certificate }}" }
+
+        - { regexp: 'prometheus_ingress_bool', var: "{{ prometheus_ingress_bool }}" }
+        - { regexp: 'prometheus_address_http$', var: "{{ prometheus_address_http }}" }
+        - { regexp: 'prometheus_address_https', var: "{{ prometheus_address_https }}" }
+        - { regexp: 'prometheus_certificate', var: "{{ prometheus_certificate }}" }
+
+        - { regexp: 'pushgateway_ingress_bool', var: "{{ pushgateway_ingress_bool }}" }
+        - { regexp: 'pushgateway_address_http$', var: "{{ pushgateway_address_http }}" }
+        - { regexp: 'pushgateway_address_https', var: "{{ pushgateway_address_https }}" }
+        - { regexp: 'pushgateway_certificate', var: "{{ pushgateway_certificate }}" }
+    - name: Prepairing Grafana Deployment
+      become_user: ubuntu
+      replace:
+        path: ~/monitoring/grafana.yaml
+        regexp: "{{ item.regexp }}"
+        replace: "{{ item.var }}"
+      with_items:
+        - { regexp: 'grafana_ingress_bool', var: "{{ grafana_ingress_bool }}" }
+        - { regexp: 'grafana_address_http$', var: "{{ grafana_address_http }}" }
+        - { regexp: 'grafana_address_https', var: "{{ grafana_address_https }}" }
+        - { regexp: 'grafana_certificate', var: "{{ grafana_certificate }}" }        
+        - { regexp: 'grafanapw', var: "{{ grafana_admin_pw }}" }
+    - name: Deploying Monitoring       
+      become_user: ubuntu
+      shell: helm install -f {{ item.yaml }} >> monitoring_{{ item.file }}.info
+      with_items:
+        - { yaml: '~/monitoring/prometheus.yaml stable/prometheus --namespace monitoring --name monitoring', file: 'prometheus_installed' }
+        - { yaml: '~/monitoring/grafana.yaml stable/grafana --namespace monitoring --name grafana', file: 'grafana_installed' }                
       args:
         chdir: $HOME
-        creates: prometheus-volume_created.txt
-    - name: Creating grafana persistent volume
-      become_user: ubuntu
-      shell: kubectl create -f ~/monitoring/grafana-pv.yaml >> grafana-volume_created.txt
-      args:
-        chdir: $HOME
-        creates: grafana-volume_created.txt
-    - name: Installing prometheus using HELM and Charts
-      become_user: ubuntu
-      shell: helm install -f ~/monitoring/prometheus.yaml stable/prometheus --namespace monitoring --name monitoring >> prometheus_installed.txt
-      args:
-        chdir: $HOME
-        creates: prometheus_installed.txt
-    - name: Installing grafana using HELM and Charts
-      become_user: ubuntu
-      shell: helm install -f ~/monitoring/grafana.yaml stable/grafana --namespace monitoring --name grafana >> grafana_installed.txt
-      args:
-        chdir: $HOME
-        creates: grafana_installed.txt
-- hosts: master
-  become: yes
-  become_user: ubuntu
-  gather_facts: false
-  tasks:
-    -  shell: grep -R "monitoring-prometheus-server.monitoring.svc.cluster.local" ~/prometheus_installed.txt
-       register: datasource_url
-    -  debug: var=datasource_url
+        creates: monitoring_{{ item.file }}.info

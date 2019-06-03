@@ -81,13 +81,13 @@ alertmanager:
   ingress:
     ## If true, alertmanager Ingress will be created
     ##
-    enabled: false
+    enabled: alertmanager_ingress_bool
 
     ## alertmanager Ingress annotations
     ##
-    annotations: {}
-    #   kubernetes.io/ingress.class: nginx
-    #   kubernetes.io/tls-acme: 'true'
+    annotations: 
+      kubernetes.io/ingress.class: nginx
+      kubernetes.io/tls-acme: 'true'
 
     ## alertmanager Ingress additional labels
     ##
@@ -96,17 +96,17 @@ alertmanager:
     ## alertmanager Ingress hostnames with optional path
     ## Must be provided if Ingress is enabled
     ##
-    hosts: []
-    #   - alertmanager.domain.com
+    hosts: 
+      - alertmanager_address_http
     #   - domain.com/alertmanager
 
     ## alertmanager Ingress TLS configuration
     ## Secrets must be manually created in the namespace
     ##
-    tls: []
-    #   - secretName: prometheus-alerts-tls
-    #     hosts:
-    #       - alertmanager.domain.com
+    tls:
+      - secretName: alertmanager_certificate
+        hosts:
+          - alertmanager_address_https
 
   ## Alertmanager Deployment Strategy type
   # strategy:
@@ -146,11 +146,11 @@ alertmanager:
     ## Ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
     ##
     accessModes:
-      - ReadWriteOnce
+      - ReadWriteMany
 
     ## alertmanager data Persistent Volume Claim annotations
     ##
-    annotations: 
+    annotations: {}
 
     ## alertmanager data Persistent Volume existing claim name
     ## Requires alertmanager.persistentVolume.enabled: true
@@ -163,7 +163,7 @@ alertmanager:
 
     ## alertmanager data Persistent Volume size
     ##
-    size: 8Gi
+    size: 2Gi
 
     ## alertmanager data Persistent Volume Storage Class
     ## If defined, storageClassName: <storageClass>
@@ -315,7 +315,7 @@ kubeStateMetrics:
   ##
   image:
     repository: quay.io/coreos/kube-state-metrics
-    tag: v1.5.0
+    tag: v1.6.0
     pullPolicy: IfNotPresent
 
   ## kube-state-metrics priorityClassName
@@ -404,7 +404,7 @@ nodeExporter:
   ##
   image:
     repository: prom/node-exporter
-    tag: v0.17.0
+    tag: v0.18.0
     pullPolicy: IfNotPresent
 
   ## Specify if a Pod Security Policy for node-exporter must be created
@@ -502,7 +502,7 @@ nodeExporter:
     ##
     externalIPs: []
 
-    hostPort: 9100
+    hostPort: Null
     loadBalancerIP: ""
     loadBalancerSourceRanges: []
     servicePort: 9100
@@ -518,7 +518,7 @@ server:
   ##
   image:
     repository: prom/prometheus
-    tag: v2.7.1
+    tag: v2.9.2
     pullPolicy: IfNotPresent
 
   ## prometheus server priorityClassName
@@ -554,6 +554,9 @@ server:
   ## This flag controls access to the administrative HTTP API which includes functionality such as deleting time
   ## series. This is disabled by default.
   enableAdminApi: false
+
+  ## This flag controls BD locking
+  skipTSDBLock: false
 
   ## Path to a configuration file on prometheus server container FS
   configPath: /etc/config/prometheus.yml
@@ -615,7 +618,7 @@ server:
   ingress:
     ## If true, Prometheus server Ingress will be created
     ##
-    enabled: false
+    enabled: prometheus_ingress_bool
 
     ## Prometheus server Ingress annotations
     ##
@@ -630,17 +633,17 @@ server:
     ## Prometheus server Ingress hostnames with optional path
     ## Must be provided if Ingress is enabled
     ##
-    hosts: []
-    #   - prometheus.domain.com
+    hosts:
+      - prometheus_address_http
     #   - domain.com/prometheus
 
     ## Prometheus server Ingress TLS configuration
     ## Secrets must be manually created in the namespace
     ##
-    tls: []
-    #   - secretName: prometheus-server-tls
-    #     hosts:
-    #       - prometheus.domain.com
+    tls:
+      - secretName: prometheus_certificate
+        hosts:
+          - prometheus_address_https
 
   ## Server Deployment Strategy type
   # strategy:
@@ -680,11 +683,11 @@ server:
     ## Ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
     ##
     accessModes:
-      - ReadWriteOnce
+      - ReadWriteMany
 
     ## Prometheus server data Persistent Volume annotations
     ##
-    annotations: 
+    annotations: {}
 
     ## Prometheus server data Persistent Volume existing claim name
     ## Requires server.persistentVolume.enabled: true
@@ -697,7 +700,7 @@ server:
 
     ## Prometheus server data Persistent Volume size
     ##
-    size: 40Gi
+    size: 8Gi
 
     ## Prometheus server data Persistent Volume Storage Class
     ## If defined, storageClassName: <storageClass>
@@ -712,6 +715,9 @@ server:
     ## Useful if the volume's root directory is not empty
     ##
     subPath: ""
+
+  emptyDir:
+    sizeLimit: ""
 
   ## Annotations to be added to Prometheus server pods
   ##
@@ -774,7 +780,7 @@ server:
 
   ## Prometheus data retention period (i.e 360h)
   ##
-  retention: "744h"
+  retention: "720h"
 
 pushgateway:
   ## If false, pushgateway will not be installed
@@ -798,33 +804,34 @@ pushgateway:
 
   ## Additional pushgateway container arguments
   ##
+  ## for example: persistence.file: /data/pushgateway.data
   extraArgs: {}
 
   ingress:
     ## If true, pushgateway Ingress will be created
     ##
-    enabled: false
+    enabled: pushgateway_ingress_bool
 
     ## pushgateway Ingress annotations
     ##
-    annotations: {}
-    #   kubernetes.io/ingress.class: nginx
-    #   kubernetes.io/tls-acme: 'true'
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      kubernetes.io/tls-acme: 'true'
 
     ## pushgateway Ingress hostnames with optional path
     ## Must be provided if Ingress is enabled
     ##
-    hosts: []
-    #   - pushgateway.domain.com
-    #   - domain.com/pushgateway
+    hosts:
+      - pushgateway_address_http
+    #  - domain.com/pushgateway
 
     ## pushgateway Ingress TLS configuration
     ## Secrets must be manually created in the namespace
     ##
-    tls: []
-    #   - secretName: prometheus-alerts-tls
-    #     hosts:
-    #       - pushgateway.domain.com
+    tls:
+      - secretName: pushgateway_certificate
+        hosts:
+          - pushgateway_address_https
 
   ## Node tolerations for pushgateway scheduling to nodes with taints
   ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
@@ -876,6 +883,51 @@ pushgateway:
     loadBalancerSourceRanges: []
     servicePort: 9091
     type: ClusterIP
+
+  persistentVolume:
+    ## If true, pushgateway will create/use a Persistent Volume Claim
+    ## If false, use emptyDir
+    ##
+    enabled: true
+
+    ## pushgateway data Persistent Volume access modes
+    ## Must match those of existing PV or dynamic provisioner
+    ## Ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
+    ##
+    accessModes:
+      - ReadWriteMany
+
+    ## pushgateway data Persistent Volume Claim annotations
+    ##
+    annotations: {}
+
+    ## pushgateway data Persistent Volume existing claim name
+    ## Requires pushgateway.persistentVolume.enabled: true
+    ## If defined, PVC must be created manually before volume will be bound
+    existingClaim: "pushgateway-claim"
+
+    ## pushgateway data Persistent Volume mount root path
+    ##
+    mountPath: /data
+
+    ## pushgateway data Persistent Volume size
+    ##
+    size: 2Gi
+
+    ## alertmanager data Persistent Volume Storage Class
+    ## If defined, storageClassName: <storageClass>
+    ## If set to "-", storageClassName: "", which disables dynamic provisioning
+    ## If undefined (the default) or set to null, no storageClassName spec is
+    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+    ##   GKE, AWS & OpenStack)
+    ##
+    # storageClass: "-"
+
+    ## Subdirectory of alertmanager data Persistent Volume to mount
+    ## Useful if the volume's root directory is not empty
+    ##
+    subPath: ""
+
 
 ## alertmanager ConfigMap entries
 ##

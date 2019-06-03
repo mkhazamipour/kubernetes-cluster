@@ -1,0 +1,19 @@
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: grafana_certificate
+  namespace: monitoring
+spec:
+  secretName: grafana_certificate
+  issuerRef:
+    name: letsencrypt
+    kind: ClusterIssuer
+  commonName: grafana.url
+  dnsNames:
+  - grafana.url
+  acme:
+    config:
+    - http01:
+        ingressClass: nginx
+      domains:
+      - grafana.url

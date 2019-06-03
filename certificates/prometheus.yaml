@@ -1,19 +1,19 @@
 apiVersion: certmanager.k8s.io/v1alpha1
 kind: Certificate
 metadata:
-  name: registry-cluster-org
-  namespace: registry
+  name: prometheus_certificate
+  namespace: monitoring
 spec:
-  secretName: registry-cluster-org
+  secretName: prometheus_certificate
   issuerRef:
     name: letsencrypt
     kind: ClusterIssuer
-  commonName: registry.cluster.org
+  commonName: prometheus.url
   dnsNames:
-  - registry.cluster.org
+  - prometheus.url
   acme:
     config:
     - http01:
         ingressClass: nginx
       domains:
-      - registry.cluster.org
+      - prometheus.url

@@ -1,14 +1,38 @@
 [masters]
-master ansible_host=10.10.10.100 ansible_user=root
+master ansible_host=10.0.0.1 ansible_user=root
 [workers]
-Node-1 ansible_host=10.10.10.120 ansible_user=root
-Node-2 ansible_host=10.10.10.121 ansible_user=root
+Node-1 ansible_host=10.0.0.11 ansible_user=root
 [glusters]
-gluster1 ansible_host=10.10.10.130 ansible_user=root
-gluster2 ansible_host=10.10.10.131 ansible_user=root
+gluster1 ansible_host=10.0.0.30 ansible_user=root
 [k8s]
-k8s1 ansible_host=10.10.10.100 ansible_user=root
-k8s2 ansible_host=10.10.10.120 ansible_user=root
-k8s3 ansible_host=10.10.10.121 anisble_user=root
+k8s1 ansible_host=10.0.0.1 ansible_user=root
+k8s2 ansible_host=10.0.0.11 ansible_user=root
+[OSS]
+oss ansible_host=10.0.0.60 ansible_user=root
 [all:vars]
 ansible_python_interpreter=/usr/bin/python3
+
+prometheus_ingress_bool=true
+prometheus_address_http=prometheus.cluster.cncf.ir
+prometheus_address_https=prometheus.cluster.cncf.ir
+prometheus_certificate=prometheus-cluster-cncf-ir
+
+alertmanager_ingress_bool=true
+alertmanager_address_http=alertmanager.cluster.cncf.ir
+alertmanager_address_https=alertmanager.cluster.cncf.ir
+alertmanager_certificate=alertmanager-cluster-cncf-ir
+
+pushgateway_ingress_bool=true
+pushgateway_address_http=pushgateway.cluster.cncf.ir
+pushgateway_address_https=pushgateway.cluster.cncf.ir
+pushgateway_certificate=pushgateway-cluster-cncf-ir
+
+grafana_ingress_bool=true
+grafana_address_http=monitoring.cluster.cncf.ir
+grafana_address_https=monitoring.cluster.cncf.ir
+grafana_admin_pw=vZkuLAZkek2Hp5Mu
+grafana_certificate=monitoring-cluster-cncf-ir
+
+registry_certificate=registry-cluster-cncf-ir
+registry_address_http=registry.cluster.cncf.ir
+registry_address_https=registry.cluster.cncf.ir

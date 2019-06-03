@@ -3,30 +3,41 @@ kind: ConfigMap
 metadata:
   name: registry-config-docker
   namespace: registry
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: registry-config-docker
+  namespace: registry
 data:
   config.yml: |
     version: 0.1
     log:
-      level: warn
+      level: debug
+      formatter: text
       fields:
         service: registry
+    loglevel: debug
     storage:
-      cache:
-        blobdescriptor: inmemory
       s3:
-        region: digitalocean-ams3
-        regionendpoint: ams3.digitaloceanspaces.com
-        bucket: bucket-name
-        accesskey: key
-        secretkey: key
+        accesskey: AKIAIOSFODNN7/EXAMPLE
+        secretkey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYE/EXAMPLE/KEY
+        region: us-east-1
+        regionendpoint: http://S3-ADDRESS
+        # Make sure you've created the following bucket.
+        bucket: registry
+        secure: true
+        v4auth: true
+        chunksize: 5242880
+        rootdirectory: /
       delete:
         enabled: true
+      maintenance:
+        uploadpurging:
+          enabled: true
+          age: 168h
+          interval: 24h
+          dryrun: false
+        readonly:
+          enabled: false
     http:
       addr: :5000
-      headers:
-        X-Content-Type-Options: [nosniff]
-    health:
-      storagedriver:
-        enabled: true
-        interval: 10s
-        threshold: 3

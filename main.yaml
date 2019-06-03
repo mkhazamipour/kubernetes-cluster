@@ -1,4 +1,4 @@
-- import_playbook: intial.yaml
+- import_playbook: initial.yaml
 - import_playbook: cluster-dependencies.yaml
 - import_playbook: cluster-master.yaml
 - import_playbook: cluster-workers.yaml
