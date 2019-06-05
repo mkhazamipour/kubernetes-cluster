@@ -19,10 +19,10 @@ data:
     loglevel: debug
     storage:
       s3:
-        accesskey: AKIAIOSFODNN7/EXAMPLE
-        secretkey: wJalrXUtnFEMI/K7MDENG/bPxRfiCYE/EXAMPLE/KEY
+        accesskey: WMEXRGHAUTYWJEKZ
+        secretkey: twVntWeicnwjFiLaLswcwLgrefDoPseaZfVGlNSECaBS
         region: us-east-1
-        regionendpoint: http://S3-ADDRESS
+        regionendpoint: http://195.201.220.30:9000
         # Make sure you've created the following bucket.
         bucket: registry
         secure: true

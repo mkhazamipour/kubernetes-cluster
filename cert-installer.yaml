@@ -52,7 +52,7 @@
        - { regexp: 'registry_certificate', var: "{{ registry_certificate }}" } 
        - { regexp: 'registry.url', var: "{{ registry_address_http }}" }
 
-   - name: deploy registry
+   - name: Creating necessary Certificates
      become_user: ubuntu
      shell: kubectl create -f {{ item.yaml }} >> certificate_{{ item.file }}_created.info
      with_items:

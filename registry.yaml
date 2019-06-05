@@ -7,12 +7,12 @@
      args:
        chdir: $HOME
        creates: registry_ns_created.info
-   - name: copy registry directory
+   - name: Copy Docker Registry Configuration directory
      become_user: ubuntu
      copy:
        src: registry-with-authentication
        dest: ~/
-   - name: Prepairing Ingress Configuration
+   - name: Prepairing Docker Registry Ingress Configuration
      become_user: ubuntu
      replace:
        path: ~/registry-with-authentication/registry-ingress.yaml
@@ -22,7 +22,7 @@
        - { regexp: 'registry_certificate', var: "{{ registry_certificate }}" } 
        - { regexp: 'registry_address_http', var: "{{ registry_address_http }}" }
 
-   - name: deploy registry
+   - name: Deploying Docker Registry
      become_user: ubuntu
      shell: kubectl create -f {{ item.yaml }} >> registry_{{ item.file }}.info
      with_items:

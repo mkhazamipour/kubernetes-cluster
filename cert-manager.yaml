@@ -6,27 +6,27 @@
       copy:
         src: certificates
         dest: ~/
-    - name: setting up cert-manager namespace
+    - name: Setting up cert-manager namespace
       become_user: ubuntu
       shell: kubectl create namespace cert-manager >> cert-manager_ns_created.info
       args:
         chdir: $HOME
         creates: cert-manager_ns_created.info
       run_once: true
-    - name: labling cert-manager namespace
+    - name: Labling cert-manager namespace
       become_user: ubuntu
       shell: kubectl label namespace cert-manager certmanager.k8s.io/disable-validation="true" >> cert-manager_ns_labaled.info
       args:
         chdir: $HOME
         creates: cert-manager_ns_labaled.info
       run_once: true
-    - name: setting up cert-manager CRDs
+    - name: Setting up cert-manager CRDs
       become_user: ubuntu
       shell: kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.6/deploy/manifests/00-crds.yaml >> cert-manager_crd_installed.info
       args:
         chdir: $HOME
         creates: cert-manager_crd_installed.info
-    - name: setting up cert-manager
+    - name: Setting up cert-manager
       become_user: ubuntu
       shell: helm install --name cert-manager --namespace cert-manager stable/cert-manager >> cert-manager_installed.info
       args:
@@ -35,7 +35,7 @@
     - pause:
         prompt: "Pausing 5 Minuets to get PODs Running"
         minutes: 5
-    - name: Creating Cluster Issuer
+    - name: Creating Letsencrypt Cluster Issuer
       become_user: ubuntu
       shell: kubectl create -f ~/certificates/letsencrypt.yaml >> cluster_issuer_created.info
       args:

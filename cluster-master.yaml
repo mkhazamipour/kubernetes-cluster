@@ -21,7 +21,7 @@
         remote_src: yes
         owner: ubuntu
 
-    - name: install Pod network
+    - name: Installing Flannel as Cluster CNI 
       become: yes
       become_user: ubuntu
       shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml >> cni_created.info

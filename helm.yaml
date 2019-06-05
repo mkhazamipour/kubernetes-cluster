@@ -12,7 +12,7 @@
       copy:
         src: helm
         dest: ~/
-    - name: tiller rbac
+    - name: Adding Tiller RBAC to Cluster
       become_user: ubuntu
       shell: kubectl create -f ~/helm/tiller_rbac.yaml >> helm_rbac_created.info
       args:
