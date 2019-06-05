@@ -42,7 +42,7 @@
 - hosts: newnodes
   become: yes
   tasks:
-   - name: Install prerequisites
+   - name: Installing prerequisites
      apt: name={{item}} update_cache=yes
      with_items:
      - apt-transport-https
@@ -51,18 +51,15 @@
      - software-properties-common
    - name: Add Docker GPG key
      apt_key: url=https://download.docker.com/linux/ubuntu/gpg
-     run_once: true
    - name:  Add Docker APT repository
      apt_repository:
       repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ansible_distribution_release}} stable
-     run_once: true
-   - name: install Docker
+   - name: Installing Docker
      apt:
        name: docker-ce=18.06.3~ce~3-0~ubuntu
        state: present
        update_cache: true
-     run_once: true
-   - name: install APT Transport HTTPS
+   - name: Installing APT Transport HTTPS
      apt:
        name: apt-transport-https
        state: present
@@ -70,31 +67,26 @@
      apt_key:
        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
        state: present
-     run_once: true
    - name: add Kubernetes' APT repository
      apt_repository:
       repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
       state: present
       filename: 'kubernetes'
-     run_once: true
-   - name: install kubectl=1.13.5-00
+   - name: Installing kubectl
      apt:
-       name: kubectl
+       name: kubectl=1.13.5-00
        state: present
        update_cache: true
-     run_once: true
-   - name: install kubelet=1.13.5-00
+   - name: Installing kubelet
      apt:
-       name: kubelet
+       name: kubelet=1.13.5-00
        state: present
        update_cache: true
-     run_once: true
-   - name: install kubeadm=1.13.5-00
+   - name: Installing kubeadm
      apt:
-       name: kubeadm
+       name: kubeadm=1.13.5-00
        state: present
        update_cache: true
-     run_once: true
 - hosts: master
   become: yes
   gather_facts: false
@@ -112,4 +104,3 @@
   tasks:
     - name: join cluster
       shell: "{{ hostvars['master'].join_command }}"
-
