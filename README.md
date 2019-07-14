@@ -1,7 +1,13 @@
 # Setup Kubernetes Cluster with Ansible
 Setup kubernetes cluster with prometheus and Grafana as monitoring and private Docker registry all backed with glusterfs file storage.
 ## System and Requirements:
-Tested on Ubuntu 16.04 with Ansible 2.7.11
+Tested on Ubuntu 16.04 with Ansible 2.7.*
+
+```bash
+sudo add-apt-repository ppa:ansible/ansible-2.7
+sudo apt-get update
+sudo apt-get install ansible
+```
 
 Atleast Three VPS with 4GB RAM, 2vCPU for Master, Node and GlusterFS server.
 
